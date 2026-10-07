@@ -1,6 +1,6 @@
 {
   "name": "devhub-news-backend",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "DEVHUB global news backend",
   "main": "server.js",
   "scripts": {
