@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DEVHUB Publisher Portal</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f5f7;
+            color: #171717;
+        }
+
+        header {
+            background: #191919;
+            color: white;
+            text-align: center;
+            padding: 25px 15px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        header p {
+            color: #cccccc;
+            margin: 8px 0 0;
+        }
+
+        main {
+            max-width: 520px;
+            margin: 35px auto;
+            padding: 0 18px;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 14px;
+            margin-top: 8px;
+            margin-bottom: 12px;
+            border: 1px solid #cccccc;
+            border-radius: 9px;
+            font-size: 16px;
+        }
+
+        textarea {
+            min-height: 140px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 8px;
+            border: 0;
+            border-radius: 9px;
+            background: #191919;
+            color: white;
+            font-size: 16px;
+        }
+
+        .secondary {
+            background: #e9e9e9;
+            color: #111111;
+        }
+
+        .link {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #1e4696;
+            cursor: pointer;
+        }
+
+        .status {
+            background: #f0f0f0;
+            padding: 13px;
+            border-radius: 9px;
+            margin: 12px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>DEVHUB</h1>
+    <p>Publisher Account Portal</p>
+</header>
+
+<main>
+
+    <!-- LOGIN -->
+
+    <div id="login" class="card">
+
+        <h2>Login</h2>
+
+        <input
+            id="loginEmail"
+            type="email"
+            placeholder="Email address">
+
+        <input
+            id="loginPassword"
+            type="password"
+            placeholder="Password">
+
+        <button onclick="login()">
+            LOGIN
+        </button>
+
+        <span
+            class="link"
+            onclick="show('register')">
+            Create an account
+        </span>
+
+    </div>
+
+
+    <!-- CREATE ACCOUNT -->
+
+    <div id="register" class="card hidden">
+
+        <h2>Create Account</h2>
+
+        <input
+            id="regName"
+            placeholder="Full name">
+
+        <input
+            id="regEmail"
+            type="email"
+            placeholder="Email address">
+
+        <input
+            id="regPassword"
+            type="password"
+            placeholder="Password">
+
+        <button onclick="register()">
+            CREATE ACCOUNT
+        </button>
+
+        <span
+            class="link"
+            onclick="show('login')">
+            Back to login
+        </span>
+
+    </div>
+
+
+    <!-- DASHBOARD -->
+
+    <div id="dashboard" class="card hidden">
+
+        <h2>Account Dashboard</h2>
+
+        <div class="status">
+            Welcome to DEVHUB.
+        </div>
+
+        <div class="status">
+            Publisher status:
+            <b>Not subscribed</b>
+        </div>
+
+        <button onclick="show('submit')">
+            Submit a Story
+        </button>
+
+        <button
+            class="secondary"
+            onclick="logout()">
+            LOG OUT
+        </button>
+
+    </div>
+
+
+    <!-- STORY SUBMISSION -->
+
+    <div id="submit" class="card hidden">
+
+        <h2>Submit a Story</h2>
+
+        <p>
+            Stories are reviewed by DEVHUB
+            before publication.
+        </p>
+
+        <input
+            id="storyTitle"
+            placeholder="Headline">
+
+        <textarea
+            id="storyText"
+            placeholder="Write your story summary">
+        </textarea>
+
+        <input
+            id="storySource"
+            placeholder="Original source link">
+
+        <button onclick="submitStory()">
+            SUBMIT FOR REVIEW
+        </button>
+
+        <button
+            class="secondary"
+            onclick="show('dashboard')">
+            BACK
+        </button>
+
+    </div>
+
+
+    <div
+        id="message"
+        class="status hidden">
+    </div>
+
+</main>
+
+
+<script>
+
+const API =
+    "https://devhub-news-backend.onrender.com";
+
+
+function show(id) {
+
+    document
+        .getElementById("login")
+        .classList.add("hidden");
+
+    document
+        .getElementById("register")
+        .classList.add("hidden");
+
+    document
+        .getElementById("dashboard")
+        .classList.add("hidden");
+
+    document
+        .getElementById("submit")
+        .classList.add("hidden");
+
+    document
+        .getElementById(id)
+        .classList.remove("hidden");
+
+    document
+        .getElementById("message")
+        .classList.add("hidden");
+}
+
+
+function message(text) {
+
+    const box =
+        document.getElementById("message");
+
+    box.textContent = text;
+
+    box.classList.remove("hidden");
+}
+
+
+function register() {
+
+    const name =
+        document
+        .getElementById("regName")
+        .value
+        .trim();
+
+    const email =
+        document
+        .getElementById("regEmail")
+        .value
+        .trim();
+
+    const password =
+        document
+        .getElementById("regPassword")
+        .value;
+
+    if (
+        name.length === 0 ||
+        email.length === 0 ||
+        password.length === 0
+    ) {
+
+        message(
+            "Please complete all fields."
+        );
+
+        return;
+    }
+
+    message(
+        "Account registration will be connected to the DEVHUB server next."
+    );
+}
+
+
+function login() {
+
+    const email =
+        document
+        .getElementById("loginEmail")
+        .value
+        .trim();
+
+    const password =
+        document
+        .getElementById("loginPassword")
+        .value;
+
+    if (
+        email.length === 0 ||
+        password.length === 0
+    ) {
+
+        message(
+            "Enter your email and password."
+        );
+
+        return;
+    }
+
+    message(
+        "Login will be connected to the DEVHUB server next."
+    );
+}
+
+
+function submitStory() {
+
+    const title =
+        document
+        .getElementById("storyTitle")
+        .value
+        .trim();
+
+    const story =
+        document
+        .getElementById("storyText")
+        .value
+        .trim();
+
+    const source =
+        document
+        .getElementById("storySource")
+        .value
+        .trim();
+
+    if (
+        title.length === 0 ||
+        story.length === 0 ||
+        source.length === 0
+    ) {
+
+        message(
+            "Please complete the story fields."
+        );
+
+        return;
+    }
+
+    message(
+        "Story submitted for DEVHUB review."
+    );
+}
+
+
+function logout() {
+
+    show("login");
+}
+
+</script>
+
+</body>
+  </html>
